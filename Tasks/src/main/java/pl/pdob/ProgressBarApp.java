@@ -17,6 +17,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.invoke.MethodHandles;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -132,8 +134,20 @@ public class ProgressBarApp extends Application {
 
             @Override
             protected void failed() {
-                logger.error(getException().getMessage(),getException());
-                Alert alert = new Alert(Alert.AlertType.ERROR, getException().getMessage());
+                Throwable exception = getException();
+                logger.error(exception.getMessage(), exception);
+                Alert alert = new Alert(Alert.AlertType.ERROR, exception.getMessage());
+
+
+
+                StringWriter errorMsg = new StringWriter();
+                exception.printStackTrace(new PrintWriter(errorMsg));
+
+                Label label = new Label(errorMsg.toString());
+                label.setWrapText(true);
+                ScrollPane scroll = new ScrollPane(label);
+                scroll.fitToHeightProperty();
+                alert.getDialogPane().setExpandableContent(scroll);
                 alert.showAndWait();
             }
         };
